@@ -138,6 +138,15 @@ class AdventOfCodeDay07(object):
 
 
 def main():
+    # This isn't working. The specifications are not
+    # guaranteed to be in any specific order.
+    # TODO: Update unit tests to have a test "out of order"
+    # TODO: Update implementation to store references
+    #       instead of actual values, and evaluate the
+    #       reference when needed.
+    #       Optional: Store evaluated reference to avoid
+    #       evaluating a second time for the same circuits
+    #       sections.
     advent_day_07_inst = AdventOfCodeDay07()
     with open("input/day_07.txt", "r") as inputFile:
         for command_text in inputFile:
