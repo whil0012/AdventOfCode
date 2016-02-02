@@ -2,6 +2,8 @@ import unittest
 
 from setuptools.compat import basestring
 
+from numbers import Number
+
 
 class TestAdventOfCodeDay07(unittest.TestCase):
     def setUp(self):
@@ -13,41 +15,47 @@ class TestAdventOfCodeDay07(unittest.TestCase):
 
     def testProcessCommand_Assign_SetsValue(self):
         self.AdventOfCodeDay07Inst.process_command("123 -> x")
-        actual = self.AdventOfCodeDay07Inst.Wire_Values["x"]
+        actual = self.AdventOfCodeDay07Inst.get_value("x")
+        self.assertEqual(actual, 123)
+
+    def testProcessCommand_AssignWireValue_SetsValue(self):
+        self.AdventOfCodeDay07Inst.process_command("123 -> x")
+        self.AdventOfCodeDay07Inst.process_command("x -> y")
+        actual = self.AdventOfCodeDay07Inst.get_value("y")
         self.assertEqual(actual, 123)
 
     def testProcessCommand_Not_AssignsNotVale(self):
-        self.AdventOfCodeDay07Inst.Wire_Values["x"] = 123
+        self.AdventOfCodeDay07Inst.set_value("x", 123)
         self.AdventOfCodeDay07Inst.process_command("NOT x -> h")
-        actual = self.AdventOfCodeDay07Inst.Wire_Values["h"]
+        actual = self.AdventOfCodeDay07Inst.get_value("h")
         self.assertEqual(actual, 65412)
 
     def testProcessCommand_And_AssignsAndValue(self):
-        self.AdventOfCodeDay07Inst.Wire_Values["x"] = 123
-        self.AdventOfCodeDay07Inst.Wire_Values["y"] = 456
+        self.AdventOfCodeDay07Inst.set_value("x", 123)
+        self.AdventOfCodeDay07Inst.set_value("y", 456)
         self.AdventOfCodeDay07Inst.process_command("x AND y -> d")
-        actual = self.AdventOfCodeDay07Inst.Wire_Values["d"]
+        actual = self.AdventOfCodeDay07Inst.get_value("d")
         self.assertEqual(actual, 72)
 
     def testProcessCommand_Or_AssignsOrValue(self):
-        self.AdventOfCodeDay07Inst.Wire_Values["x"] = 123
-        self.AdventOfCodeDay07Inst.Wire_Values["y"] = 456
+        self.AdventOfCodeDay07Inst.set_value("x", 123)
+        self.AdventOfCodeDay07Inst.set_value("y", 456)
         self.AdventOfCodeDay07Inst.process_command("x OR y -> e")
-        actual = self.AdventOfCodeDay07Inst.Wire_Values["e"]
+        actual = self.AdventOfCodeDay07Inst.get_value("e")
         self.assertEqual(actual, 507)
 
     def testProcessCommand_LeftShift_AssignsLeftShiftValue(self):
-        self.AdventOfCodeDay07Inst.Wire_Values["x"] = 123
-        self.AdventOfCodeDay07Inst.Wire_Values["y"] = 456
+        self.AdventOfCodeDay07Inst.set_value("x", 123)
+        self.AdventOfCodeDay07Inst.set_value("y", 456)
         self.AdventOfCodeDay07Inst.process_command("x LSHIFT 2 -> f")
-        actual = self.AdventOfCodeDay07Inst.Wire_Values["f"]
+        actual = self.AdventOfCodeDay07Inst.get_value("f")
         self.assertEqual(actual, 492)
 
     def testProcessCommand_RightShift_AssignsRightShiftValue(self):
-        self.AdventOfCodeDay07Inst.Wire_Values["x"] = 123
-        self.AdventOfCodeDay07Inst.Wire_Values["y"] = 456
+        self.AdventOfCodeDay07Inst.set_value("x", 123)
+        self.AdventOfCodeDay07Inst.set_value("y", 456)
         self.AdventOfCodeDay07Inst.process_command("y RSHIFT 2 -> g")
-        actual = self.AdventOfCodeDay07Inst.Wire_Values["g"]
+        actual = self.AdventOfCodeDay07Inst.get_value("g")
         self.assertEqual(actual, 114)
 
 
@@ -55,7 +63,7 @@ class AdventOfCodeDay07(object):
     not_16_bit_mask = 0xFFFF
 
     def __init__(self):
-        self.Wire_Values = {}
+        self.__Wire_Values = {}
 
     @staticmethod
     def not_16_bit(value):
@@ -77,10 +85,10 @@ class AdventOfCodeDay07(object):
             self.__process_right_shift_command(command_segments)
 
     def __process_and_command(self, command_segments):
-        self.__process_binary_command(command_segments, lambda x: self.__get_value(x), lambda x, y: x & y)
+        self.__process_binary_command(command_segments, lambda x: self.get_value(x), lambda x, y: x & y)
 
     def __process_or_command(self, command_segments):
-        self.__process_binary_command(command_segments, lambda x: self.__get_value(x), lambda x, y: x | y)
+        self.__process_binary_command(command_segments, lambda x: self.get_value(x), lambda x, y: x | y)
 
     def __process_left_shift_command(self, command_segments):
         self.__process_binary_command(command_segments, lambda x: int(x), lambda x, y: x << y)
@@ -92,22 +100,26 @@ class AdventOfCodeDay07(object):
         input_wire_1 = command_segments[0]
         input_wire_2 = command_segments[2]
         output_wire = command_segments[4]
-        input_value_1 = self.__get_value(input_wire_1)
+        input_value_1 = self.get_value(input_wire_1)
         input_value_2 = interpret_second_argument_function(input_wire_2)
         output_value = binary_function(input_value_1, input_value_2)
-        self.__set_value(output_wire, output_value)
+        self.set_value(output_wire, output_value)
 
     def __process_assign_command(self, command_segments):
-        value = int(command_segments[0])
+        value = command_segments[0]
+        if value.isdigit():
+            wire_value = int(value)
+        else:
+            wire_value = self.get_value(value)
         wire_name = command_segments[2]
-        self.__set_value(wire_name, value)
+        self.set_value(wire_name, wire_value)
 
     def __process_not_command(self, command_segments):
         input_wire_name = command_segments[1]
         output_wire_name = command_segments[3]
-        input_value = self.__get_value(input_wire_name)
+        input_value = self.get_value(input_wire_name)
         not_value = AdventOfCodeDay07.not_16_bit(input_value)
-        self.__set_value(output_wire_name, not_value)
+        self.set_value(output_wire_name, not_value)
 
     def __is_command_text(self, command, command_text_to_compare):
         return isinstance(command, basestring) and (command.casefold() == command_text_to_compare.casefold())
@@ -130,11 +142,11 @@ class AdventOfCodeDay07(object):
     def __is_right_shift_command(self, command_segments):
         return self.__is_command_text(command_segments[1], "rshift")
 
-    def __get_value(self, wire_name):
-        return self.Wire_Values[wire_name]
+    def get_value(self, wire_name):
+        return self.__Wire_Values[wire_name]
 
-    def __set_value(self, wire_name, value):
-        self.Wire_Values[wire_name] = value
+    def set_value(self, wire_name, value):
+        self.__Wire_Values[wire_name] = value
 
 
 def main():
