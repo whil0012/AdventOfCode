@@ -30,7 +30,7 @@ Given Santa's current password (your puzzle input), what should his next passwor
 
 Your puzzle input is cqjxjnds
 
-cqjxxyzz
+Your puzzle answer was cqjxxyzz
 
 --- Part Two ---
 
