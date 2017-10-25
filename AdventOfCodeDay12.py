@@ -1,71 +1,125 @@
 import unittest
+import json
 
 
 class TestAdventOfCodeDay12(unittest.TestCase):
-    def testSumNumbers_WhenNoNumbers_Returns0(self):
-        actual = sumNumbers("this has no numbers")
+    def test_sum_numbers_WhenNoNumbers_Returns0(self):
+        actual = sum_numbers("[\"text\"]")
         self.assertEqual(actual, 0)
 
-    def testSumNumbers_WhenOneNumber_ReturnsNumber(self):
-        actual = sumNumbers("this has a number 3")
+    def test_sum_numbers_WhenOneNumberInList_ReturnsNumber(self):
+        actual = sum_numbers("[3]")
         self.assertEqual(actual, 3)
 
-    def testSumNumbers_WhenEmptyString_Returns0(self):
-        actual = sumNumbers("")
+    def test_sum_numbers_WhenOneNumberInDictionary_ReturnsNumber(self):
+        actual = sum_numbers("{\"a\":3}")
+        self.assertEqual(actual, 3)
+
+    def test_sum_numbers_WhenEmptyString_Returns0(self):
+        actual = sum_numbers("")
         self.assertEqual(actual, 0)
 
-    def testSumNumbers_WhenNone_Returns0(self):
-        actual = sumNumbers(None)
+    def test_sum_numbers_WhenNone_Returns0(self):
+        actual = sum_numbers(None)
         self.assertEqual(actual, 0)
 
-    def testSumNumbers_WhenNumbersAtBeginningAndEnd_ReturnsSum(self):
-        actual = sumNumbers("4 text 5 more text 2")
-        self.assertEqual(actual, 11)
-
-    def testSumNumbers_WhenMultiDigitSingleNumber_ReturnsSum(self):
-        actual = sumNumbers("text 123")
+    def test_sum_numbers_WhenMultiDigitSingleNumberInList_ReturnsSum(self):
+        actual = sum_numbers("[123]")
         self.assertEqual(actual, 123)
 
-    def testSumNumbers_WhenMultipleMultiDigitSingleNumbers_ReturnsSum(self):
-        actual = sumNumbers("1 some text 42 32 more text 55")
+    def test_sum_numbers_WhenMultiDigitSingleNumberInDictionary_ReturnsSum(self):
+        actual = sum_numbers("{\"a\":123}")
+        self.assertEqual(actual, 123)
+
+    def test_sum_numbers_WhenMultipleMultiDigitSingleNumbersInList_ReturnsSum(self):
+        actual = sum_numbers("[1,42,32,55]")
         self.assertEqual(actual, 130)
 
-    def testSumNumbers_WhenNegativeNumber_ReturnsNumber(self):
-        actual = sumNumbers("-4")
+    def test_sum_numbers_WhenMultipleMultiDigitSingleNumbersInDictionary_ReturnsSum(self):
+        actual = sum_numbers("{\"a\":1,\"b\":42,\"c\":32,\"d\":55}")
+        self.assertEqual(actual, 130)
+
+    def test_sum_numbers_WhenNegativeNumberInList_ReturnsNumber(self):
+        actual = sum_numbers("[-4]")
         self.assertEqual(actual, -4)
 
+    def test_sum_numbers_WhenNegativeNumberInDictionary_ReturnsNumber(self):
+        actual = sum_numbers("{\"a\":-4}")
+        self.assertEqual(actual, -4)
 
-def get_int_value(text):
-    value = 0
+    def test_sum_numbers_WhenNumbersAndTextInList_ReturnsSum(self):
+        actual = sum_numbers("[\"text\",42,23,\"more text\",21]")
+        self.assertEqual(actual, 86)
+
+    def test_sum_numbers_WhenNumbersAndTextInDictionary_ReturnsSum(self):
+        actual = sum_numbers("{\"a\":\"text\",\"b\":42,\"c\":23,\"d\":\"more text\",\"e\":21}")
+        self.assertEqual(actual, 86)
+
+    def test_sum_numbers_WhenListContainsList_IncludesSumOfChildList(self):
+        actual = sum_numbers("[2,23,[55,10]]")
+        self.assertEqual(actual, 90)
+
+    def test_sum_numbers_WhenDictionaryContainsList_IncludesSumOfChildList(self):
+        actual = sum_numbers("{\"a\":2,\"b\":23,\"c\":[55,10]}")
+        self.assertEqual(actual, 90)
+
+    def test_sum_numbers_WhenListContainsDictionary_IncludesSumOfChildDictionary(self):
+        actual = sum_numbers("[2,23,{\"a\":55,\"b\":10}]")
+        self.assertEqual(actual, 90)
+
+    def test_sum_numbers_WhenDictionaryContainsDictionary_IncludesSumOfChildDictionary(self):
+        actual = sum_numbers("{\"a\":2,\"b\":23,\"c\":[55,10]}")
+        self.assertEqual(actual, 90)
+
+
+def get_int_value(value):
     try:
-        value = int(text)
-    except:
+        value = int(value)
+    except ValueError:
         value = 0
     return value
 
 
-def sumNumbers(text):
+def sum_numbers_in_value(value):
+    sum_result = 0
+    if isinstance(value, list):
+        sum_result += sum_numbers_in_list(value)
+    elif isinstance(value, dict):
+        sum_result += sum_numbers_in_dictionary(value)
+    else:
+        sum_result += get_int_value(value)
+    return sum_result
+
+
+def sum_numbers_in_list(list_obj):
+    sum_result = 0
+    for value in list_obj:
+        sum_result += sum_numbers_in_value(value)
+    return sum_result
+
+
+def sum_numbers_in_dictionary(dict_obj):
+    sum_result = 0
+    for value in dict_obj.values():
+        sum_result += sum_numbers_in_value(value)
+    return sum_result
+
+
+def sum_numbers(text):
     if text is None:
         return 0
+    if text == "":
+        return 0
 
-    found_number_string = ""
-    numbers_sum = 0
-
-    for character in text:
-        if character.isnumeric() or character == '-':
-            found_number_string += character
-        else:
-            numbers_sum += get_int_value(found_number_string)
-            found_number_string = ""
-    numbers_sum += get_int_value(found_number_string)
-    return numbers_sum
+    json_obj = json.loads(text)
+    return sum_numbers_in_value(json_obj)
 
 
 def main():
     sum_of_numbers = 0
     infile = open("input\\day_12.txt", "r")
     for line in infile:
-        sum_of_numbers += sumNumbers(line)
+        sum_of_numbers += sum_numbers(line)
 
     print("sum: ", sum_of_numbers)
 
