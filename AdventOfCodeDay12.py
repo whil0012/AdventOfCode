@@ -71,6 +71,14 @@ class TestAdventOfCodeDay12(unittest.TestCase):
         actual = sum_numbers("{\"a\":2,\"b\":23,\"c\":[55,10]}")
         self.assertEqual(actual, 90)
 
+    def test_sum_numbers_WhenDictionaryContainsValueOfRed_Returns0(self):
+        actual = sum_numbers("{\"c\":\"red\",\"b\":2}", True)
+        self.assertEqual(actual, 0)
+
+    def test_sum_numbers_WhenListContainsDictionaryThatContainsValueOfRed_ExcludesDictionaryValuesSum(self):
+        actual = sum_numbers("[1,{\"c\":\"red\",\"b\":2},3]", True)
+        self.assertEqual(actual, 4)
+
 
 def get_int_value(value):
     try:
@@ -80,48 +88,53 @@ def get_int_value(value):
     return value
 
 
-def sum_numbers_in_value(value):
+def sum_numbers_in_value(value, ignore_red):
     sum_result = 0
     if isinstance(value, list):
-        sum_result += sum_numbers_in_list(value)
+        sum_result += sum_numbers_in_list(value, ignore_red)
     elif isinstance(value, dict):
-        sum_result += sum_numbers_in_dictionary(value)
+        sum_result += sum_numbers_in_dictionary(value, ignore_red)
     else:
         sum_result += get_int_value(value)
     return sum_result
 
 
-def sum_numbers_in_list(list_obj):
+def sum_numbers_in_list(list_obj, ignore_red):
     sum_result = 0
     for value in list_obj:
-        sum_result += sum_numbers_in_value(value)
+        sum_result += sum_numbers_in_value(value, ignore_red)
     return sum_result
 
 
-def sum_numbers_in_dictionary(dict_obj):
+def sum_numbers_in_dictionary(dict_obj, ignore_red):
     sum_result = 0
+    if ignore_red and "red" in dict_obj.values():
+        return 0
     for value in dict_obj.values():
-        sum_result += sum_numbers_in_value(value)
+        sum_result += sum_numbers_in_value(value, ignore_red)
     return sum_result
 
 
-def sum_numbers(text):
+def sum_numbers(text, ignore_red = False):
     if text is None:
         return 0
     if text == "":
         return 0
 
     json_obj = json.loads(text)
-    return sum_numbers_in_value(json_obj)
+    return sum_numbers_in_value(json_obj, ignore_red)
 
 
 def main():
     sum_of_numbers = 0
+    sum_of_numbers_ignore_red = 0
     infile = open("input\\day_12.txt", "r")
     for line in infile:
-        sum_of_numbers += sum_numbers(line)
+        sum_of_numbers = sum_numbers(line)
+        sum_of_numbers_ignore_red = sum_numbers(line, True)
 
-    print("sum: ", sum_of_numbers)
+    print("sum (including red): ", sum_of_numbers)
+    print("sum (excluding red): ", sum_of_numbers_ignore_red)
 
 
 if __name__ == '__main__':
