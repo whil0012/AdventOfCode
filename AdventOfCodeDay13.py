@@ -126,6 +126,10 @@ def get_happiness_set(happiness_description):
     happiness_value = int(description_segments[description_index_happiness_value]) * happiness_multiplier
     person1 = description_segments[description_index_person1]
     person2 = description_segments[description_index_person2].replace(".", "")
+    return get_happiness_set_item(happiness_value, person1, person2)
+
+
+def get_happiness_set_item(happiness_value, person1, person2):
     return NamedPropertyItem.named_property_item(happiness=happiness_value,
                                                  person1=person1,
                                                  person2=person2)
@@ -141,6 +145,20 @@ def get_total_happiness(happiness_sets, seating_arrangement):
             person2 = seating_arrangement[0]
         total_happiness += get_total_happiness_for_pair(happiness_sets, person1, person2)
     return total_happiness
+
+
+def get_minimum_happiness(happiness_sets, seating_arrangement):
+    minimum_happiness = get_total_happiness_for_pair(happiness_sets, seating_arrangement[0], seating_arrangement[1])
+    for i in range(0, len(seating_arrangement)):
+        person1 = seating_arrangement[i]
+        if i < len(seating_arrangement) - 1:
+            person2 = seating_arrangement[i + 1]
+        else:
+            person2 = seating_arrangement[0]
+        total_happiness = get_total_happiness_for_pair(happiness_sets, person1, person2)
+        if total_happiness < minimum_happiness:
+            minimum_happiness = total_happiness
+    return minimum_happiness
 
 
 def get_unique_persons_combinations(happiness_sets):
@@ -170,12 +188,32 @@ def get_maximum_happiness(happiness_sets):
     return max_happiness_value
 
 
+def get_happiness_sets_with_me(happiness_sets):
+    happiness_sets_result = happiness_sets
+    unique_persons = get_unique_persons(happiness_sets)
+    happiness_sets_with_me_as_person1 = [get_happiness_set_item(0, "Levi", x) for x in unique_persons]
+    happiness_sets_with_me_as_person2 = [get_happiness_set_item(0, x, "Levi") for x in unique_persons]
+    for happiness_set in happiness_sets_with_me_as_person1:
+        happiness_sets_result.append(happiness_set)
+    for happiness_set in happiness_sets_with_me_as_person2:
+        happiness_sets_result.append(happiness_set)
+    return happiness_sets_result
+
+
 def main():
     with open("input/day_13.txt", "r") as input_file:
         happiness_sets = [get_happiness_set(x) for x in input_file]
     max_happiness = get_maximum_happiness(happiness_sets)
     print(max_happiness.seating_arrangement)
     print(max_happiness.total_happiness)
+
+    happiness = get_minimum_happiness(happiness_sets, max_happiness.seating_arrangement)
+    print(happiness)
+    # happiness_sets_with_me = get_happiness_sets_with_me(happiness_sets)
+    # max_happiness = get_maximum_happiness(happiness_sets_with_me)
+    # print(max_happiness.seating_arrangement)
+    # print(max_happiness.total_happiness)
+
 
 
 if __name__ == "__main__":

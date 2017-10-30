@@ -36,9 +36,9 @@ Carol       Alice
 After trying every other seating arrangement in this hypothetical scenario, you find that this one is the most optimal,
 with a total change in happiness of 330.
 
-What is the total change in happiness for the optimal seating arrangement of the actual guest list?Y
+What is the total change in happiness for the optimal seating arrangement of the actual guest list?
 
-our puzzle answer was 733.
+Your puzzle answer was 733.
 
 The first half of this puzzle is complete! It provides one gold star: *
 
@@ -51,3 +51,5 @@ else would be just as ambivalent about sitting next to you, too.
 So, add yourself to the list, and give all happiness relationships that involve you a score of 0.
 
 What is the total change in happiness for the optimal seating arrangement that actually includes yourself?
+
+Your puzzle answer was 725.
