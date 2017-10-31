@@ -21,3 +21,5 @@ has only gotten 1056 km by that point). So, in this situation, Comet would win (
 
 Given the descriptions of each reindeer (in your puzzle input), after exactly 2503 seconds, what distance has the
 winning reindeer traveled?
+
+Your puzzle answer was 2660.
