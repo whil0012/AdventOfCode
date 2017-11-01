@@ -68,9 +68,18 @@ def get_reindeer_distance(reindeer, flight_time):
 
 
 def main():
-    reindeer = GetNamedPropertyItemsFromFile.get_named_property_items_from_file("input/day_14.txt", get_reindeer_from_description)
-    max_distance = max([get_reindeer_distance(x, 2503) for x in reindeer])
+    reindeers = GetNamedPropertyItemsFromFile.get_named_property_items_from_file("input/day_14.txt", get_reindeer_from_description)
+    max_distance = max([get_reindeer_distance(x, 2503) for x in reindeers])
     print("max distance: ", max_distance)
+    race_points = {key: 0 for key in [reindeer.name for reindeer in reindeers]}
+    for time in range(1, 2504):
+        race_distances = {reindeer.name: get_reindeer_distance(reindeer, time) for reindeer in reindeers}
+        max_distance = max(race_distances.values())
+        for reindeer_name in race_distances.keys():
+            if race_distances[reindeer_name] == max_distance:
+                race_points[reindeer_name] += 1
+    max_points = max(race_points.values())
+    print("max points: ", max_points)
 
 
 if __name__ == "__main__":
