@@ -23,13 +23,34 @@ class TestAdventOfCodeDay15(unittest.TestCase):
                 self.assertTrue(number >= 1, "number: " + str(number) + "; combination: " + str(combination))
                 self.assertTrue(number <= 97, "number: " + str(number) + "; combination: " + str(combination))
 
-    def test_get_score_WhenButterscotchAndCinnamon_ReturnsCorrectScore(self):
+    def test_get_recipe_score_WhenButterscotchAndCinnamon_ReturnsCorrectScore(self):
         butterscotch = self.get_butterscotch_named_property_item()
         cinnamon = self.get_cinnamon_named_property_item()
         recipe = [(butterscotch, 44), (cinnamon, 56)]
         actual = get_recipe_score(recipe)
-        self.assertEqual(actual, 62842880)
+        self.assertEqual(actual.score, 62842880)
 
+    def test_get_recipe_score_WhenOneTotalIsNegative_ReturnsZero(self):
+        butterscotch = self.get_butterscotch_named_property_item()
+        cinnamon = self.get_cinnamon_named_property_item()
+        recipe = [(butterscotch, 70), (cinnamon, 30)]
+        actual = get_recipe_score(recipe)
+        self.assertEqual(actual.score, 0)
+
+    def test_get_recipe_score_WhenOneTotalIsZero_ReturnsZero(self):
+        butterscotch = self.get_butterscotch_named_property_item()
+        cinnamon = self.get_cinnamon_named_property_item()
+        cinnamon.capacity = 1
+        recipe = [(butterscotch, 50), (cinnamon, 50)]
+        actual = get_recipe_score(recipe)
+        self.assertEqual(actual.score, 0)
+
+    def test_get_recipe_score_WhenButterscotchAndCinnamon_ReturnsCalories(self):
+        butterscotch = self.get_butterscotch_named_property_item()
+        cinnamon = self.get_cinnamon_named_property_item()
+        recipe = [(butterscotch, 44), (cinnamon, 56)]
+        actual = get_recipe_score(recipe)
+        self.assertEqual(actual.calories, 520)
 
 
 def get_all_combinations_for_100():
@@ -68,7 +89,7 @@ def get_recipe_score(recipe):
         scores[2] += get_flavor(recipe_item)
         scores[3] += get_texture(recipe_item)
         calories += get_calories(recipe_item)
-    if any(score <= 0 for score in scores):
+    if any(score < 0 for score in scores):
         total_score = 0
     else:
         total_score = scores[0] * scores[1] * scores[2] * scores[3]
