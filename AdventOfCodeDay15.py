@@ -55,16 +55,24 @@ def get_texture(recipe_item):
     return recipe_item[0].texture * recipe_item[1]
 
 
+def get_calories(recipe_item):
+    return recipe_item[0].calories * recipe_item[1]
+
+
 def get_recipe_score(recipe):
     scores = [0, 0, 0, 0]
+    calories = 0
     for recipe_item in recipe:
         scores[0] += get_capacity(recipe_item)
         scores[1] += get_durability(recipe_item)
         scores[2] += get_flavor(recipe_item)
         scores[3] += get_texture(recipe_item)
+        calories += get_calories(recipe_item)
     if any(score <= 0 for score in scores):
-        return 0
-    return scores[0] * scores[1] * scores[2] * scores[3]
+        total_score = 0
+    else:
+        total_score = scores[0] * scores[1] * scores[2] * scores[3]
+    return NamedPropertyItem.named_property_item(score = total_score, calories=calories)
 
 
 sprinkles = NamedPropertyItem.named_property_item(name="Sprinkles", capacity=5, durability=-1, flavor=0, texture=0, calories=5)
@@ -76,12 +84,17 @@ sugar = NamedPropertyItem.named_property_item(name="Sugar", capacity=-1, durabil
 def main():
     four_ingredient_amount_combinations = get_all_combinations_for_100()
     max_score = 0
+    max_score_at_500_calories = 0
     for combination in four_ingredient_amount_combinations:
         recipe = [(sprinkles, combination[0]), (peanut_butter, combination[1]), (frosting, combination[2]), (sugar, combination[3])]
         score = get_recipe_score(recipe)
-        if score > max_score:
-            max_score = score
+        if score.score > max_score:
+            max_score = score.score
+        if score.calories == 500:
+            if score.score > max_score_at_500_calories:
+                max_score_at_500_calories = score.score
     print("max score: ", max_score)
+    print("max score at 500 calories: ", max_score_at_500_calories)
 
 
 if __name__ == "__main__":
