@@ -20,6 +20,8 @@ class TestAdventOfCodeDay16(unittest.TestCase):
 class parse_sues():
     def __init__(self, children, cats, samoyeds, pomeranians, akitas, vizslas, goldfish, trees, cars, perfumes):
         self.set_regular_expression()
+# children_re = re.compile(r"^((children: 3)|((?!children).))*$")
+# r"{}: {}".format(cats_desc, cats_count)
 
     def get_sue_number(self, sue_line):
         sue_line_segments = sue_line.split()
