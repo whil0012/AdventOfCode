@@ -26,8 +26,8 @@ class TestAdventOfCodeDay16(unittest.TestCase):
         ["Vizslas", r"Sue 11: cars: 2, children: 3, cats: 7, samoyeds: 2, pomeranians: 3, akitas: 0, vizslas: 3, goldfish: 5, trees: 3, perfumes: 1"],
         ["Goldfish", r"Sue 11: cars: 2, children: 3, cats: 7, samoyeds: 2, pomeranians: 3, akitas: 0, vizslas: 0, goldfish: 2, trees: 3, perfumes: 1"],
         ["Trees", r"Sue 11: cars: 2, children: 3, cats: 7, samoyeds: 2, pomeranians: 3, akitas: 0, vizslas: 0, goldfish: 5, trees: 9, perfumes: 1"],
-        ["Cars", r"Sue 11: cars: 7, children: 3, cats: 7, samoyeds: 2, pomeranians: 3, akitas: 0, vizslas: 0, goldfish: 2, trees: 9, perfumes: 1"],
-        ["Perfumes", r"Sue 11: cars: 2, children: 3, cats: 7, samoyeds: 2, pomeranians: 3, akitas: 0, vizslas: 0, goldfish: 2, trees: 9, perfumes: 0"]
+        ["Cars", r"Sue 11: cars: 20, children: 3, cats: 7, samoyeds: 2, pomeranians: 3, akitas: 0, vizslas: 0, goldfish: 5, trees: 3, perfumes: 1"],
+        ["Perfumes", r"Sue 11: cars: 2, children: 3, cats: 7, samoyeds: 2, pomeranians: 3, akitas: 0, vizslas: 0, goldfish: 5, trees: 3, perfumes: 10"]
     ])
     def test_does_sue_match_WhenItemDoesNotMatch_ReturnsFalse(self, name, test_sue_line):
         actual = self.system_under_test.does_sue_match(test_sue_line)
@@ -69,7 +69,7 @@ class parse_sues():
         return int(sue_number_str.replace(":", ""))
 
     def create_re(self, text, count):
-        return re.compile(r"^(({0}: {1})|((?!{0}).))*$".format(text, count))
+        return re.compile(r"^(({0}: {1}\b)|((?!{0}).))*$".format(text, count))
 
     def does_sue_match(self, test_sue_line):
         return self.regular_expression_matches(self.children_re, test_sue_line) and \
@@ -85,3 +85,17 @@ class parse_sues():
 
     def regular_expression_matches(self, regular_expression, line):
         return regular_expression.match(line) != None
+
+
+def main():
+    sue_numbers = []
+    sue_parser = parse_sues(3, 7, 2, 3, 0, 0, 5, 3, 2, 1)
+    for line in open("input/day_16.txt", "r"):
+        if sue_parser.does_sue_match(line):
+            sue_number = sue_parser.get_sue_number(line)
+            sue_numbers.append(sue_number)
+    print("sue numbers: ", sue_numbers)
+
+
+if __name__ == '__main__':
+    main()
