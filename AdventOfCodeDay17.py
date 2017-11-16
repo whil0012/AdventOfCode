@@ -9,6 +9,12 @@ class TestAdventOfCodeDay17(unittest.TestCase):
         actual = get_number_of_combinations(containers, 25)
         self.assertEquals(actual, 4)
 
+    def test_get_number_of_minimum_combinations_WhenInvoked_ReturnsNumberOfMinimumCombinations(self):
+        containers = [20, 15, 10, 5, 5]
+        actual = get_number_of_minimum_combinations(containers, 25)
+        self.assertEquals(actual, 3)
+
+
 
 def get_number_of_matches(combinations_of_containers, total_volume):
     count = 0
@@ -26,12 +32,23 @@ def get_number_of_combinations(containers, total_volume):
         count += get_number_of_matches(combinations_of_containers, total_volume)
     return count
 
+def get_number_of_minimum_combinations(containers, total_volume):
+    count = 0
+    for i in range(1, len(containers) + 1):
+        combinations_of_containers = itertools.combinations(containers, i)
+        count = get_number_of_matches(combinations_of_containers, total_volume)
+        if count > 0:
+            break
+    return count
+
 
 def main():
     with open(os.path.join("input", "day_17.txt"), "r") as input_file:
         containers = [int(x) for x in input_file]
     number_of_combinations = get_number_of_combinations(containers, 150)
+    number_of_minimum_combinations = get_number_of_minimum_combinations(containers, 150)
     print("number of conbinations: ", number_of_combinations)
+    print("number of minimum conbinations: ", number_of_minimum_combinations)
 
 
 if __name__ == "__main__":
