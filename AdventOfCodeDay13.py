@@ -207,6 +207,11 @@ def main():
     print(max_happiness.seating_arrangement)
     print(max_happiness.total_happiness)
 
+    # Since all happiness ratings between myself and others is 0, it actually removes
+    # happiness from the seating arrangement (if total is positive). So, just find the
+    # minimum happiness value between two people and insert myself there. I.e. take the
+    # maximum happiness rating and subtract the minimum happiness value, and that's the
+    # maximum possible happiness value with myself in the seating arrangement.
     happiness = get_minimum_happiness(happiness_sets, max_happiness.seating_arrangement)
     print(happiness)
     # happiness_sets_with_me = get_happiness_sets_with_me(happiness_sets)
