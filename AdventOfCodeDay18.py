@@ -50,6 +50,15 @@ class TestAdventOfCodeDay18(unittest.TestCase):
         actual = count_lights_on(light_states)
         self.assertEquals(actual, 4)
 
+    def test_update_lights_WhenStuckLights_LeaversCornersOn(self):
+        light_states = get_light_states_from_lines(['#.#', '#.#', '#.#'])
+        light_states_next_step = update_lights(light_states, True)
+        self.assertEquals(light_states_next_step[0][0], Light_State.On)
+        self.assertEquals(light_states_next_step[0][2], Light_State.On)
+        self.assertEquals(light_states_next_step[2][0], Light_State.On)
+        self.assertEquals(light_states_next_step[2][2], Light_State.On)
+
+
 
 class Light_State(Enum):
     Off = 0
@@ -60,10 +69,15 @@ def count_lights_on(light_states):
     return sum([x.count(Light_State.On) for x in light_states])
 
 
-def update_lights(light_states):
+def update_lights(light_states, lights_are_stuck = False):
     new_light_states =  [[x for x in row] for row in light_states]
     for i in range(0, len(light_states)):
         for j in range(0, len(light_states[i])):
+            if lights_are_stuck and \
+                ((i == 0 and j == 0) or (i == 0 and j == len(light_states[i]) - 1) or \
+                 (i == len(light_states) - 1 and j == 0) or (i == len(light_states) - 1 and j == len(light_states[i]) - 1)):
+                new_light_states[i][j] = Light_State.On
+                continue
             neighbor_count = count_on_neighbors(i, j, light_states)
             if light_states[i][j] == Light_State.On:
                 new_light_states[i][j] = Light_State.On if (neighbor_count == 2 or neighbor_count == 3) else Light_State.Off
@@ -100,7 +114,8 @@ def main():
     with open(os.path.join("input", "day_18.txt"), "r") as input_file:
         light_states = [get_light_states_from_line(x.strip()) for x in input_file]
     for step in range(0, 100):
-        light_states = update_lights(light_states)
+        # light_states = update_lights(light_states)
+        light_states = update_lights(light_states, True)
     count = count_lights_on(light_states)
     print("count of lights on: ", count)
 
