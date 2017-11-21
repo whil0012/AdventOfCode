@@ -45,20 +45,43 @@ def get_transitions_count(transitions, desired_molecule):
     return count + 1
 
 
+def get_max_replacement_length(transitions):
+    return max([len(x.replacement) for x in transitions])
+
+
 def make_reverse_transitions(transitions, desired_molecule):
     total_count = 0
     current_molecule = desired_molecule
-    transitions_sorted = sorted(transitions, key=lambda x: len(x.replacement), reverse=True)
     attempt_more_transitions = True
+    max_replacement_length = get_max_replacement_length(transitions)
     while attempt_more_transitions:
         transitions_loop_count = 0
-        for transition in transitions_sorted:
-            transitions_result = make_reverse_transitions_for_item(transition, current_molecule)
-            transitions_loop_count += transitions_result.count
-            current_molecule = transitions_result.molecule
+        transitions_result = make_first_reverse_transition(transitions, current_molecule, max_replacement_length)
+        transitions_loop_count += transitions_result.count
+        current_molecule = transitions_result.molecule
         total_count += transitions_loop_count
         attempt_more_transitions = transitions_loop_count > 0
     return total_count
+
+
+def make_first_reverse_transition(transitions, current_molecule, max_replacement_length, starting_index = 0):
+    if starting_index >= len(current_molecule):
+        return NamedPropertyItem.named_property_item(count = 0, molecule = current_molecule)
+    for i in range(starting_index + 1, starting_index + max_replacement_length + 1):
+        replacement_test = current_molecule[starting_index:i]
+        matches = find_transition_for_replacement(transitions, replacement_test)
+        if len(matches) > 0:
+            return make_reverse_transition(matches[0], current_molecule)
+    return make_first_reverse_transition(transitions, current_molecule, max_replacement_length, starting_index + 1)
+
+
+def make_reverse_transition(transition, molecule):
+    new_molecule = molecule.replace(transition.replacement, transition.item, 1)
+    return NamedPropertyItem.named_property_item(count = 1, molecule = new_molecule)
+
+
+def find_transition_for_replacement(transitions, replacement_test):
+    return [x for x in transitions if x.replacement == replacement_test]
 
 
 def make_reverse_transitions_for_item(transition, molecule):
@@ -147,6 +170,15 @@ def main():
     distinct_molecules = get_distinct_molecules(transitions, formula)
     print("number of distinct molecules: ", len(distinct_molecules))
     transitions_count = get_transitions_count(transitions_list, formula)
+    print("number of transitions: ", transitions_count)
+    rn_count = formula.count("Rn")
+    ar_count = formula.count("Ar")
+    y_count = formula.count("Y")
+
+    element_count = sum([formula.count(x) for x in transitions.keys()])
+    transitions_count = len(formula) - rn_count - ar_count - (y_count * 2) - 1
+    print("number of transitions: ", transitions_count)
+    transitions_count = (element_count + rn_count + ar_count + y_count) - rn_count - ar_count - (y_count * 2) - 1
     print("number of transitions: ", transitions_count)
 
 
