@@ -27,4 +27,8 @@ gets 70 presents, because it is visited by Elves 1, 2, and 4, for a total of 10 
 
 What is the lowest house number of the house to get at least as many presents as the number in your puzzle input?
 
-Your puzzle input is 29000000.
+Your puzzle input is 29 000 000.
+
+Your puzzle answer was 665280.
+
+The first half of this puzzle is complete! It provides one gold star: *
